@@ -199,7 +199,7 @@ canvas.chart{width:100%; height:340px; display:block;}
 .hero-overlay .container{width:100%}
 .hero-title{
   color:#fff;
-  font-size:62px;
+  font-size:54px;
   font-weight:900;
   letter-spacing:-0.03em;
   max-width:980px;
@@ -211,6 +211,8 @@ canvas.chart{width:100%; height:340px; display:block;}
   margin-top:10px;
 }
 .hero-meta{margin-top:14px; color: rgba(255,255,255,.86); font-size:18px;}
+.hero-affiliations{margin-top:14px; color: rgba(255,255,255,.86); font-size:16px;}
+
 .hero-links{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
 .hero-links .btn{background: rgba(255,255,255,.92)}
 .hero-links .btn:hover{background:#fff}
