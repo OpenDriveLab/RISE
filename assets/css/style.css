@@ -317,7 +317,7 @@ canvas.chart{width:100%; height:340px; display:block;}
 
 
 .contrib-list{
-  margin: 5px 0 0;
+  margin: 10px 0 0;
   padding-left: 0;              /* 关键：去掉默认左缩进 */
   list-style-position: inside;  /* 关键：bullet 放进内容框，从最左开始 */
 }
@@ -589,7 +589,7 @@ canvas.chart{width:100%; height:340px; display:block;}
   display: block;
 }
 
-.caption {
+.carousel-card .caption {
   margin-top: 15px;
   font-size: 18px;
   font-weight: bold;
