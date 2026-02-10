@@ -266,7 +266,7 @@
     
     <div>
       <div class="media">
-        <video style="pointer-events: none;" src="https://assets.kinetixai.cn/rise3/backpack_anti_disturbance_self_recovery_RISE_compressed.mp4" autoplay muted loop playsinline></video>
+        <video style="pointer-events: none;" src="https://assets.kinetixai.cn/rise3/backpack_anti_disturbance_self_recovery_RISE_compressed1.mp4" autoplay muted loop playsinline></video>
       </div>
       <div class="caption">
         <b>Self-Correction & Robustness</b>
@@ -365,6 +365,9 @@
 <section id="results">
   <h2>Results</h2>
   <h3>Main Results</h3>
+  <p class="small" style="margin-bottom:12px">
+    RISE outperforms all baselines with +35% on brick sorting, +45% on backpack packing, and +35% on box closing through world model imagination.
+  </p>
 
   <div class="card" style="padding:14px; margin-top:10px">
     <div class="toolbar">
@@ -405,6 +408,10 @@
   <hr/>
 
   <h3>Ablations</h3>
+  <p class="small" style="margin-bottom:12px">
+    <b>Left:</b> Optimal offline ratio (0.6) balances demonstrations with online rollouts.<br/>
+    <b>Right:</b> Both online actions and states essential; full RISE with all components achieves best performance.
+  </p>
   <div class="grid2 ablation-grid" style="margin-top:10px">
     <div class="card">
       <div class="canvas-wrap">
