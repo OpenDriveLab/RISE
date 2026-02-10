@@ -1297,3 +1297,14 @@ h1, h2, h3, p, li, .caption, .small {
 
 
 main .caption { opacity: 1 !important; }
+
+@media (max-width: 768px) {
+  .hero-overlay .hero-links {
+    margin-top: 10px;      /* 可选：按钮离上方稍微留一点 */
+    margin-bottom: 20px;   /* 关键：拉开和标题的距离，建议 18~28px */
+  }
+
+  .hero-overlay .hero-title {
+    margin-top: 0;
+  }
+}
