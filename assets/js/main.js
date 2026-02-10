@@ -538,6 +538,7 @@ window.addEventListener("load", ()=>{
   setupBackToTop();
   setupFadeInAnimations();
   setupActiveNav();
+  setupVisitorCounter();
 });
 
 /* ===== Hero video interactions ===== */
@@ -1080,4 +1081,94 @@ function setupFadeInAnimations(){
   });
   
   elements.forEach(el => observer.observe(el));
+}
+
+/* ===== Busuanzi Visitor Counter (Owner Only) ===== */
+function setupVisitorCounter(){
+  const OWNER_PASSWORD = "rise123"; // 修改为你自己的密码
+  
+  // 创建统计面板
+  function createStatsPanel(){
+    const panel = document.createElement('div');
+    panel.id = 'visitorStatsPanel';
+    panel.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 2px solid #5b7cfa;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 350px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-family: system-ui, -apple-system, Segoe UI;
+      font-size: 14px;
+      display: none;
+    `;
+    panel.innerHTML = `
+      <div style="margin-bottom: 16px; font-weight: 700; font-size: 16px; color: #5b7cfa; border-bottom: 2px solid #e6e6e6; padding-bottom: 10px;">📊 访客统计（不蒜子）</div>
+      <div style="margin-bottom: 8px; color: #333; line-height: 1.8;">
+        <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+          <span>🌐 本站总访问量:</span>
+          <strong style="color: #5b7cfa;"><span id="busuanzi_value_site_pv">--</span> 次</strong>
+        </div>
+        <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+          <span>👥 本站访客数:</span>
+          <strong style="color: #5b7cfa;"><span id="busuanzi_value_site_uv">--</span> 人</strong>
+        </div>
+        <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+          <span>📄 本页访问量:</span>
+          <strong style="color: #5b7cfa;"><span id="busuanzi_value_page_pv">--</span> 次</strong>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6e6e6; font-size: 12px; color: #999;">
+        统计数据由 <a href="http://busuanzi.ibruce.info/" target="_blank" style="color: #5b7cfa;">不蒜子</a> 提供
+      </div>
+      <button id="closeStats" style="width: 100%; padding: 10px; margin-top: 12px; background: #5b7cfa; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">关闭</button>
+    `;
+    document.body.appendChild(panel);
+    
+    // 关闭按钮
+    document.getElementById('closeStats').addEventListener('click', () => {
+      panel.style.display = 'none';
+    });
+    
+    return panel;
+  }
+  
+  // 打开统计面板（需要密码）
+  function showStatsPanel(){
+    const pwd = prompt('请输入访客统计密码:');
+    if(pwd === OWNER_PASSWORD){
+      const panel = document.getElementById('visitorStatsPanel') || createStatsPanel();
+      panel.style.display = 'block';
+      
+      // 等待不蒜子数据加载
+      setTimeout(() => {
+        const pv = document.getElementById('busuanzi_value_site_pv');
+        if(pv && pv.textContent === '--'){
+          pv.textContent = '加载中...';
+        }
+      }, 500);
+    } else if(pwd !== null){
+      alert('密码错误!');
+    }
+  }
+  
+  window.showStatsPanel = showStatsPanel;
+  
+  // 绑定按钮
+  const statsBtn = document.getElementById('statsBtn');
+  if(statsBtn){
+    statsBtn.addEventListener('click', showStatsPanel);
+  }
+  
+  // 添加快捷键：Ctrl+Shift+S 打开统计
+  document.addEventListener('keydown', (e) => {
+    if(e.ctrlKey && e.shiftKey && e.code === 'KeyS'){
+      e.preventDefault();
+      showStatsPanel();
+    }
+  });
 }

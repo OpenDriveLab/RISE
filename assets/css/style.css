@@ -1470,3 +1470,15 @@ main .caption { opacity: 1 !important; }
     margin-top: 0;
   }
 }
+
+/* ===== Visitor Stats Button (Hidden at bottom) ===== */
+#statsBtn:hover {
+  opacity: 0.8 !important;
+  background: rgba(91, 124, 250, 0.2) !important;
+  transform: scale(1.15);
+}
+
+#statsBtn:active {
+  transform: scale(0.9);
+  opacity: 1 !important;
+}
