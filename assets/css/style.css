@@ -588,8 +588,10 @@ canvas.chart{width:100%; height:340px; display:block;}
 }
 .contrib-number{
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1a73e8, #5b7cfa);
   color: #fff;
@@ -597,8 +599,10 @@ canvas.chart{width:100%; height:340px; display:block;}
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1;
   box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+  text-align: center;
 }
 .contrib-content{
   flex: 1;
@@ -1237,9 +1241,11 @@ h1, h2, h3, p, li, .caption, .small {
     gap: 12px;
   }
   .contrib-number {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    font-size: 15px;
   }
   .contrib-content {
     font-size: 14px;
