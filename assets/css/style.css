@@ -591,7 +591,7 @@ canvas.chart{width:100%; height:340px; display:block;}
   display: block;
 }
 
-.carousel-card .caption {
+/* .carousel-card .caption {
   margin-top: 15px;
   font-size: 18px;
   font-weight: bold;
@@ -602,6 +602,19 @@ canvas.chart{width:100%; height:340px; display:block;}
 }
 
 .carousel-card.is-active .caption {
+  opacity: 1;
+} */
+
+.carousel-caption {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.carousel-card.is-active .carousel-caption {
   opacity: 1;
 }
 
@@ -935,7 +948,7 @@ h1, h2, h3, p, li, .caption, .small {
   object-fit: cover;
   display: block;
 }
-
+/* 
 .caption {
   margin-top: 12px;
   font-size: 16px;
@@ -944,8 +957,8 @@ h1, h2, h3, p, li, .caption, .small {
   text-align: center;
   opacity: 0;
   transition: opacity 0.3s;
-}
-.carousel-card.is-active .caption { opacity: 1; }
+} */
+/* .carousel-card.is-active .caption { opacity: 1; } */
 
 /* --- 按钮样式 (核弹级层级) --- */
 .nav-btn {
@@ -994,3 +1007,6 @@ h1, h2, h3, p, li, .caption, .small {
     box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   }
 }
+
+
+main .caption { opacity: 1 !important; }
