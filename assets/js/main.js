@@ -1122,10 +1122,16 @@ function setupVisitorCounter(){
           <strong style="color: #5b7cfa;"><span id="busuanzi_value_page_pv">--</span> 次</strong>
         </div>
       </div>
+      <div style="margin-top: 12px; padding: 8px; background: #f5f5f5; border-radius: 6px; font-size: 12px;">
+        <div style="color: #666;">状态: <span id="busuanzi_status" style="color: #5b7cfa;">检测中...</span></div>
+      </div>
       <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e6e6e6; font-size: 12px; color: #999;">
         统计数据由 <a href="http://busuanzi.ibruce.info/" target="_blank" style="color: #5b7cfa;">不蒜子</a> 提供
       </div>
-      <button id="closeStats" style="width: 100%; padding: 10px; margin-top: 12px; background: #5b7cfa; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">关闭</button>
+      <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button id="refreshStats" style="flex: 1; padding: 10px; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">🔄 刷新</button>
+        <button id="closeStats" style="flex: 1; padding: 10px; background: #5b7cfa; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">关闭</button>
+      </div>
     `;
     document.body.appendChild(panel);
     
@@ -1134,7 +1140,50 @@ function setupVisitorCounter(){
       panel.style.display = 'none';
     });
     
+    // 刷新按钮
+    document.getElementById('refreshStats').addEventListener('click', () => {
+      // 重新加载不蒜子脚本
+      const oldScript = document.querySelector('script[src*="busuanzi"]');
+      if(oldScript){
+        oldScript.remove();
+      }
+      
+      const newScript = document.createElement('script');
+      newScript.async = true;
+      newScript.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+      document.body.appendChild(newScript);
+      
+      // 更新状态
+      const statusEl = document.getElementById('busuanzi_status');
+      if(statusEl){
+        statusEl.textContent = '🔄 正在刷新...';
+      }
+      
+      // 3秒后检查状态
+      setTimeout(() => {
+        const status = checkBusuanziStatus();
+        if(statusEl){
+          statusEl.textContent = status;
+        }
+      }, 3000);
+    });
+    
     return panel;
+  }
+  
+  // 检查不蒜子是否加载
+  function checkBusuanziStatus(){
+    const pv = document.getElementById('busuanzi_value_site_pv');
+    const uv = document.getElementById('busuanzi_value_site_uv');
+    const ppv = document.getElementById('busuanzi_value_page_pv');
+    
+    if(typeof window.busuanzi !== 'undefined'){
+      return '✅ 已加载';
+    } else if(pv && pv.textContent && pv.textContent !== '--'){
+      return '✅ 数据正常';
+    } else {
+      return '⏳ 加载中...（可能需要等待30秒-1分钟）';
+    }
   }
   
   // 打开统计面板（需要密码）
@@ -1144,13 +1193,20 @@ function setupVisitorCounter(){
       const panel = document.getElementById('visitorStatsPanel') || createStatsPanel();
       panel.style.display = 'block';
       
-      // 等待不蒜子数据加载
+      // 检查加载状态
       setTimeout(() => {
-        const pv = document.getElementById('busuanzi_value_site_pv');
-        if(pv && pv.textContent === '--'){
-          pv.textContent = '加载中...';
+        const status = checkBusuanziStatus();
+        const statusEl = document.getElementById('busuanzi_status');
+        if(statusEl){
+          statusEl.textContent = status;
         }
-      }, 500);
+        
+        // 如果还是 -- 就提示刷新
+        const pv = document.getElementById('busuanzi_value_site_pv');
+        if(pv && (pv.textContent === '--' || !pv.textContent)){
+          pv.textContent = '等待中...';
+        }
+      }, 1000);
     } else if(pwd !== null){
       alert('密码错误!');
     }
