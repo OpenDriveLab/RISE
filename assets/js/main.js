@@ -185,12 +185,22 @@ function drawBarChartPerBar(cfg){
 
     bars.push({x,y,w:barW,h:bh,label:labels[i],value:v});
 
-    const t = labels[i].length>18 ? labels[i].slice(0,16)+"…" : labels[i];
-    const isRiseLabel = (t === "RISE" || labels[i] === "RISE");
-    ctx.fillStyle="rgba(11,16,32,.85)";
-    ctx.font=(isRiseLabel?"700 ":"500 ")+"11px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.fillText(t, pad.l + i*groupW + groupW/2, pad.t+plotH+12);
+  // === 修改开始：支持 \n 换行 ===
+    const lines = labels[i].split('\n'); // 按换行符分割
+    const isRiseLabel = (labels[i] === "RISE");
+    
+    ctx.fillStyle = "rgba(11,16,32,.85)";
+    ctx.font = (isRiseLabel ? "700 " : "500 ") + "11px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.textAlign = "center"; 
+    ctx.textBaseline = "top";
+
+    lines.forEach((line, lineIdx) => {
+      // 只有当单行文本过长时才截断（防止意外截断你的长标签）
+      const textToDraw = (line.length > 20) ? line.slice(0, 18) + "…" : line;
+      // lineIdx * 14 控制行间距
+      ctx.fillText(textToDraw, pad.l + i * groupW + groupW / 2, pad.t + plotH + 12 + (lineIdx * 14));
+    });
+    // === 修改结束 ===
   }
 
   if(cfg.title){
@@ -292,12 +302,22 @@ function drawGroupedBarChart(cfg){
       
       bars.push({x,y,w:barW*0.92,h:bh,label:labels[i],series:s.name,value:v});
     }
-    const t = labels[i].length>18 ? labels[i].slice(0,16)+"…" : labels[i];
-    const isRiseLabel = (t === "RISE" || labels[i] === "RISE");
-    ctx.fillStyle="rgba(11,16,32,.85)";
-    ctx.font=(isRiseLabel?"700 ":"500 ")+"11px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.fillText(t, pad.l + i*groupW + groupW/2, pad.t+plotH+12);
+  // === 修改开始：支持 \n 换行 ===
+    const lines = labels[i].split('\n'); // 按换行符分割
+    const isRiseLabel = (labels[i] === "RISE");
+    
+    ctx.fillStyle = "rgba(11,16,32,.85)";
+    ctx.font = (isRiseLabel ? "700 " : "500 ") + "11px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.textAlign = "center"; 
+    ctx.textBaseline = "top";
+
+    lines.forEach((line, lineIdx) => {
+      // 只有当单行文本过长时才截断（防止意外截断你的长标签）
+      const textToDraw = (line.length > 20) ? line.slice(0, 18) + "…" : line;
+      // lineIdx * 14 控制行间距
+      ctx.fillText(textToDraw, pad.l + i * groupW + groupW / 2, pad.t + plotH + 12 + (lineIdx * 14));
+    });
+    // === 修改结束 ===
   }
 
   if(cfg.title){
