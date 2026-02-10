@@ -4,21 +4,34 @@ const q = (s, el=document)=>el.querySelector(s);
 const qa = (s, el=document)=>[...el.querySelectorAll(s)];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 
-/* Active nav */
-function setActiveNav(){
+/* Active nav - Enhanced */
+function setupActiveNav(){
   const sections = qa("section[id]");
-  const links = qa(".nav-links a");
-  const y = window.scrollY + 140;
-  let current = sections[0]?.id;
-  for (const sec of sections){
-    if (sec.offsetTop <= y) current = sec.id;
+  const navLinks = qa(".nav a[href^='#']");
+  
+  function updateActiveNav(){
+    const y = window.scrollY + 160;
+    let current = '';
+    
+    sections.forEach(sec => {
+      const sectionTop = sec.offsetTop;
+      const sectionHeight = sec.clientHeight;
+      if(y >= sectionTop - 100 && y < sectionTop + sectionHeight){
+        current = sec.getAttribute('id');
+      }
+    });
+    
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if(link.getAttribute('href') === '#' + current){
+        link.classList.add('active');
+      }
+    });
   }
-  links.forEach(a=>{
-    a.classList.toggle("active", a.getAttribute("href")==="#"+current);
-  });
+  
+  window.addEventListener("scroll", updateActiveNav, {passive:true});
+  updateActiveNav();
 }
-window.addEventListener("scroll", setActiveNav, {passive:true});
-window.addEventListener("load", setActiveNav);
 
 /* Video modal */
 function openModal(videoRef){
@@ -169,6 +182,16 @@ function drawBarChartPerBar(cfg){
       ctx.lineWidth=2;
       ctx.stroke();
     }
+    
+    // Draw data label on top of bar (only if animation is near complete)
+    if(animProgress > 0.7 && bh > 20){
+      const labelText = cfg.yFmt ? cfg.yFmt(v) : v.toFixed(0);
+      ctx.fillStyle = "rgba(0,0,0,.85)";
+      ctx.font = "700 11px ui-sans-serif, system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(labelText, x + barW/2, y - 4);
+    }
 
     bars.push({x,y,w:barW,h:bh,label:labels[i],value:v});
 
@@ -276,6 +299,17 @@ function drawGroupedBarChart(cfg){
       const y = pad.t + plotH - bh;
       ctx.fillStyle=s.color;
       drawRoundedBar(ctx, x,y,barW*0.92,bh,6);
+      
+      // Draw data label on grouped bars
+      if(animProgress > 0.7 && bh > 15){
+        const labelText = cfg.yFmt ? cfg.yFmt(v) : v.toFixed(0);
+        ctx.fillStyle = "rgba(0,0,0,.75)";
+        ctx.font = "600 9px ui-sans-serif, system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(labelText, x + barW*0.92/2, y - 3);
+      }
+      
       bars.push({x,y,w:barW*0.92,h:bh,label:labels[i],series:s.name,value:v});
     }
     const t = labels[i].length>18 ? labels[i].slice(0,16)+"…" : labels[i];
@@ -501,6 +535,9 @@ window.addEventListener("load", ()=>{
   setupProgressBar();
   setupCopyButtons();
   setupCharts();
+  setupBackToTop();
+  setupFadeInAnimations();
+  setupActiveNav();
 });
 
 /* ===== Hero video interactions ===== */
@@ -894,7 +931,38 @@ function initCarousel() {
         if (video) video.pause();
       }
     });
+    
+    // Update indicators
+    updateIndicators();
   }
+  
+  // Update carousel indicators
+  function updateIndicators(){
+    const indicators = document.querySelectorAll('#carouselIndicators .indicator');
+    // Map current index (1-3 with clones) to original (0-2)
+    let realIndex = currentIndex - 1;
+    if(realIndex < 0) realIndex = originalCards.length - 1;
+    if(realIndex >= originalCards.length) realIndex = 0;
+    
+    indicators.forEach((ind, i) => {
+      ind.classList.toggle('active', i === realIndex);
+    });
+  }
+  
+  // Click indicator to jump
+  const indicators = document.querySelectorAll('#carouselIndicators .indicator');
+  indicators.forEach((ind, i) => {
+    ind.addEventListener('click', () => {
+      if(isTransitioning) return;
+      const targetIndex = i + 1; // +1 because of clone offset
+      if(targetIndex !== currentIndex){
+        currentIndex = targetIndex;
+        isTransitioning = true;
+        updateActive();
+        updateTrack(true);
+      }
+    });
+  });
 
   // 5. 切换逻辑
   function switchSlide(direction) {
@@ -968,9 +1036,48 @@ function initCarousel() {
   // 初始化
   updateTrack(false);
   updateActive();
+  updateIndicators();
   window.addEventListener('resize', () => updateTrack(false));
 }
 
 window.addEventListener('load', () => {
   try { initCarousel(); } catch(e) { console.error(e); }
 });
+
+/* ===== Back to Top Button ===== */
+function setupBackToTop(){
+  const btn = q('#backToTop');
+  if(!btn) return;
+  
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 400){
+      btn.classList.add('show');
+    } else {
+      btn.classList.remove('show');
+    }
+  }, {passive: true});
+}
+
+/* ===== Fade-in Animations on Scroll ===== */
+function setupFadeInAnimations(){
+  const elements = qa('.fade-in, .fade-in-section');
+  if(elements.length === 0) return;
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+  
+  elements.forEach(el => observer.observe(el));
+}

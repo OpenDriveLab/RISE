@@ -56,7 +56,7 @@
       </div>
       <!-- <div class="pill">Project Page</div> -->
       <div class="hero-title" id="heroTitle">RISE: Self-Improving Robot Policy with Compositional World Model</div>
-      <div class="hero-subtitle" id="heroSubtitle" style="text-align: justify;">
+      <div class="hero-subtitle" id="heroSubtitle" style="text-align: left;">
           The first study on leveraging world
           models as an effective learning environment for challenging
           real-world manipulation, bootstrapping performance on tasks
@@ -126,7 +126,7 @@
 
 <main class="container mainwrap">
 
-<section id="overview">
+<section id="overview" class="fade-in-section">
   <h2>At a Glance</h2>
  <h3>System Overview</h3>
   <!-- <div style="margin-top:10px"></div> -->
@@ -136,37 +136,46 @@
       <video src="https://assets.kinetixai.cn/rise2/teaser.mp4" autoplay muted loop playsinline></video>
     </div>
     <div class="caption">
-        <b>RISE</b> shifts the 
-        RL environment to a <b>Compositional World Model</b>, which first emulates future observations for proposed actions, then
+        <strong class="highlight">RISE</strong> shifts the 
+        RL environment to a <strong class="highlight">Compositional World Model</strong>, which first emulates future observations for proposed actions, then
         evaluates imagined states to derive advantage for policy improvement.
     </div>
   </div>
 
 
   <h3>Contributions</h3>
-  <ul class="contrib-list">
-    <li>
-      <b>RISE</b>, a principled framework for robotic reinforcement learning, that
-      enables autonomous self-improvement in a scalable and online manner.
-      RISE overcomes the physical restrictions posed by prior art by shifting
-      robotic interactions from physical environment to imaginative space.
-    </li>
+  <div class="contrib-cards">
+    <div class="contrib-card fade-in">
+      <div class="contrib-number">①</div>
+      <div class="contrib-content">
+        <strong class="highlight">RISE</strong>, a principled framework for robotic reinforcement learning, that
+        enables autonomous self-improvement in a scalable and online manner.
+        RISE overcomes the physical restrictions posed by prior art by shifting
+        robotic interactions from physical environment to imaginative space.
+      </div>
+    </div>
 
-    <li>
-      <b>Compositional World Model</b>, an online learning environment that builds reliable dynamics and value estimates
-      for real-world tasks. We unveil critical design choices to derive informative learning
-      signals for policy improvement.
-    </li>
+    <div class="contrib-card fade-in">
+      <div class="contrib-number">②</div>
+      <div class="contrib-content">
+        <strong class="highlight">Compositional World Model</strong>, an online learning environment that builds reliable dynamics and value estimates
+        for real-world tasks. We unveil critical design choices to derive informative learning
+        signals for policy improvement.
+      </div>
+    </div>
 
-    <li>
-      Through extensive experiments on <b>dexterous manipulation tasks</b>, we demonstrate
-      that RISE exhibits significantly higher performance compared to existing RL methods.
-    </li>
-  </ul>
+    <div class="contrib-card fade-in">
+      <div class="contrib-number">③</div>
+      <div class="contrib-content">
+        Through extensive experiments on <strong class="highlight">dexterous manipulation tasks</strong>, we demonstrate
+        that RISE exhibits significantly higher performance compared to existing RL methods.
+      </div>
+    </div>
+  </div>
 </section>
 
 
-<section id="demos">
+<section id="demos" class="fade-in-section">
   <h2>Real-World Autonomous Execution</h2>
   
 
@@ -207,6 +216,13 @@
   <button class="nav-btn next-btn" id="nextBtn">
     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
   </button>
+  
+  <!-- Carousel Indicators -->
+  <div class="carousel-indicators" id="carouselIndicators">
+    <span class="indicator active" data-index="0"></span>
+    <span class="indicator" data-index="1"></span>
+    <span class="indicator" data-index="2"></span>
+  </div>
 </div>
 <hr/>
 
@@ -333,7 +349,7 @@
 </section>
 <hr/>
 
-<section id="method">
+<section id="method" class="fade-in-section">
   <h2 class="section-title">Methodology</h2>
 
 
@@ -382,11 +398,11 @@
 
 <hr/>
 
-<section id="results">
+<section id="results" class="fade-in-section">
   <h2>Results</h2>
   <h3>Main Results</h3>
   <p class="small" style="margin-bottom:12px">
-    RISE outperforms all baselines with +35% on brick sorting, +45% on backpack packing, and +35% on box closing through world model imagination.
+    <strong class="highlight">RISE</strong> outperforms all baselines with <span class="number-highlight">+35%</span> on brick sorting, <span class="number-highlight">+45%</span> on backpack packing, and <span class="number-highlight">+35%</span> on box closing through world model imagination.
   </p>
 
   <div class="card" style="padding:14px; margin-top:10px">
@@ -432,7 +448,7 @@
 
   <h3>Ablations</h3>
   <p class="small" style="margin-bottom:8px">
-    Ablation studies conducted on the <b>Dynamic Brick Sorting</b> task.
+    Ablation studies conducted on the <strong class="highlight">Dynamic Brick Sorting</strong> task.
   </p>
   <p class="small" style="margin-bottom:12px">
     <b>Left:</b> Optimal offline ratio (0.6) balances demonstrations with online rollouts.<br/>
@@ -617,13 +633,13 @@
 
 <hr/>
 
-<section id="abstract">
+<section id="abstract" class="fade-in-section">
   <h2>Abstract</h2>
   <p style="text-align: justify; line-height: 1.7;">
     Despite the sustained scaling on model capacity and data acquisition, 
     Vision–Language–Action (VLA) models remain brittle in contact-rich and dynamic manipulation tasks, 
     where minor execution deviations can compound into failures. 
-    While reinforcement learning (RL) offers a principled path to robustness, on-policy RL in the physical world is constrained by safety risk, hardware cost, and environment reset. To bridge this gap, we present RISE, a scalable framework of robotic reinforcement learning via imagination. At its core is a Compositional World Model that (i) predicts multi-view future via a controllable dynamics model, and (ii) evaluates imagined outcomes with a progress value model, producing informative advantages for the policy improvement. Such compositional design allows state and value to be tailored by best-suited yet distinct architectures and objectives. These components are integrated into a closed-loop self-improving pipeline that continuously generates imaginary rollouts, estimates advantages, and updates the policy in imaginary space without costly physical interaction. Across three challenging real-world tasks, RISE yields significant improvement over prior art, with more than +35% absolute performance increase in dynamic brick sorting, +45% for backpack packing, and +35% for box closing, respectively.
+    While reinforcement learning (RL) offers a principled path to robustness, on-policy RL in the physical world is constrained by safety risk, hardware cost, and environment reset. To bridge this gap, we present <strong class="highlight">RISE</strong>, a scalable framework of robotic reinforcement learning via imagination. At its core is a <strong class="highlight">Compositional World Model</strong> that (i) predicts multi-view future via a controllable dynamics model, and (ii) evaluates imagined outcomes with a progress value model, producing informative advantages for the policy improvement. Such compositional design allows state and value to be tailored by best-suited yet distinct architectures and objectives. These components are integrated into a closed-loop self-improving pipeline that continuously generates imaginary rollouts, estimates advantages, and updates the policy in imaginary space without costly physical interaction. Across three challenging real-world tasks, <strong class="highlight">RISE</strong> yields significant improvement over prior art, with more than <span class="number-highlight">+35%</span> absolute performance increase in dynamic brick sorting, <span class="number-highlight">+45%</span> for backpack packing, and <span class="number-highlight">+35%</span> for box closing, respectively.
   </p>
 </section>
 
@@ -652,7 +668,7 @@
 
 <!-- <hr/> -->
 
-<section id="bibtex">
+<section id="bibtex" class="fade-in-section">
   <h2>BibTeX</h2>
   <div class="toolbar">
     <div class="small">Copy the citation:</div>
@@ -677,6 +693,13 @@
     <div class="small" style="color:#ddd; margin-top:8px">Press ESC to close. Double-click videos to open here.</div>
   </div>
 </div>
+
+<!-- Back to Top Button -->
+<button id="backToTop" class="back-to-top" title="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
 
 <script src="assets/js/main.js"></script>
 <script>

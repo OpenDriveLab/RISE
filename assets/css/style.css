@@ -27,7 +27,7 @@ hr {
   border: none;
   height: 1px;
   background: linear-gradient(to right, transparent, var(--rule) 20%, var(--rule) 80%, transparent);
-  margin: 48px 0;
+  margin: 24px 0;
   position: relative;
 }
 
@@ -175,8 +175,8 @@ p{margin:10px 0}
 .media video{width:100%; height:auto; display:block}
 .media.media-small{background:#fff; display:flex; align-items:center; justify-content:center; padding:10px}
 .media.media-small video.small-video{width:60%; max-width:720px; margin:0}
-.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
 @media (max-width:860px){ .grid2{grid-template-columns:1fr} .grid3{grid-template-columns:1fr 1fr} }
 @media (max-width:560px){ .grid3{grid-template-columns:1fr} }
 
@@ -244,7 +244,59 @@ canvas.chart{width:100%; height:340px; display:block;}
 .tooltip.on{opacity:1; transform: translateY(0)}
 
 .footer{padding:26px 0; color:var(--muted); font-size:13px}
-.progress{position:fixed; left:0; top:0; height:2px; z-index:50; width:0%; background: #1a73e8;}
+.progress{
+  position:fixed; 
+  left:0; 
+  top:0; 
+  height:3px; 
+  z-index:50; 
+  width:0%; 
+  background: linear-gradient(to right, #1a73e8, #5b7cfa, #a855f7);
+  box-shadow: 0 0 10px rgba(26, 115, 232, 0.5);
+}
+
+/* Back to Top Button */
+.back-to-top{
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a73e8, #5b7cfa);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 40;
+}
+.back-to-top.show{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.back-to-top:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+}
+.back-to-top:active{
+  transform: translateY(-2px);
+}
+@media (max-width: 768px){
+  .back-to-top{
+    right: 16px;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+  }
+}
 
 /* ===== Fullscreen hero video (VIRAL-style opening) ===== */
 .topbar{
@@ -329,6 +381,7 @@ canvas.chart{width:100%; height:340px; display:block;}
   font-weight:900;
   letter-spacing:-0.03em;
   max-width:980px;
+  text-align: left;
 }
 .hero-subtitle{
   color: rgba(255,255,255,.88);
@@ -344,14 +397,14 @@ canvas.chart{width:100%; height:340px; display:block;}
 .hero-authors{
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
 }
 .author-line{
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
-  justify-content: center;
+  justify-content: flex-start;
   line-height: 1.6;
 }
 .author-line span{
@@ -369,13 +422,13 @@ canvas.chart{width:100%; height:340px; display:block;}
   font-size:15px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
 }
 .affiliation-row{
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px 20px;
   line-height: 1.5;
 }
@@ -395,7 +448,7 @@ canvas.chart{width:100%; height:340px; display:block;}
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px 16px;
   font-size: 13px;
   color: rgba(255,255,255,.7);
@@ -406,7 +459,7 @@ canvas.chart{width:100%; height:340px; display:block;}
   font-style: normal;
 }
 
-.hero-links{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+.hero-links{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; justify-content: flex-start;}
 
 .hero-links .btn{
   background: rgba(255,255,255,.95);
@@ -506,14 +559,72 @@ canvas.chart{width:100%; height:340px; display:block;}
 }
 
 
-.contrib-list{
-  margin: 0;
-  padding-left: 0;
-  list-style-position: inside;
+/* Contributions Cards Design */
+.contrib-cards{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
 }
-.contrib-list li{
-  margin: 0 0 10px 0;
-  line-height: 1.45; /* 1.2 稍微挤，建议放松一点 */
+.contrib-card{
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.02), rgba(91, 124, 250, 0.01));
+  border: 1px solid rgba(26, 115, 232, 0.12);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.contrib-card::before{
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, #1a73e8, #5b7cfa);
+}
+.contrib-card:hover{
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+  border-color: rgba(26, 115, 232, 0.25);
+}
+.contrib-number{
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a73e8, #5b7cfa);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+.contrib-content{
+  flex: 1;
+  line-height: 1.65;
+  color: rgba(0, 0, 0, 0.82);
+}
+.highlight{
+  color: #1a73e8;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.08), transparent);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.number-highlight{
+  color: #a855f7;
+  font-weight: 700;
+  background: rgba(168, 85, 247, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /* ===== Visual sections ===== */
@@ -710,8 +821,8 @@ canvas.chart{width:100%; height:340px; display:block;}
   position: relative;
   max-width: 1000px;
   /* margin: 30px auto;*/
-  margin: var(--space-block) auto 0;
-  padding: 20px 0;
+  margin: 0 auto;
+  padding: 12px 0 42px 0; /* 底部留空给indicators */
   overflow: hidden;
 }
 
@@ -828,30 +939,64 @@ canvas.chart{width:100%; height:340px; display:block;}
 .prev-btn { left: 20px; }
 .next-btn { right: 20px; }
 
+/* Carousel Indicators */
+.carousel-indicators{
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+.indicator{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(120, 140, 170, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.indicator:hover{
+  background: rgba(120, 140, 170, 0.5);
+  transform: scale(1.2);
+}
+.indicator.active{
+  width: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #1a73e8, #5b7cfa);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.4);
+}
+
 
 
 :root {
   /* ... 原有变量 ... */
-  --gap-section: 40px;    /* 大章节 (Section) 之间的距离 */
+  --gap-section: 16px;    /* 大章节 (Section) 之间的距离 */
   --gap-sub: 20px;        /* 小标题 (h3/Subsection) 之间的距离 */
-  --gap-element: 16px;    /* 标题与下方内容 (文字/图片/视频) 之间的距离 */
+  --gap-element: 12px;    /* 标题与下方内容 (文字/图片/视频) 之间的距离 */
 }
 
 /* 1. 统一 Section 间距与视觉分隔 */
 section {
-  margin-bottom: var(--gap-section);
-  padding: 40px 0;
+  margin-bottom: 0;
+  padding: 24px 0;
   position: relative;
+}
+
+/* 相邻 section 之间添加小间距 */
+section + section {
+  margin-top: 16px;
 }
 
 /* 给偶数 section 添加轻微背景色 */
 section:nth-of-type(even) {
-  background: linear-gradient(to bottom, rgba(249, 250, 251, 0.6), rgba(255, 255, 255, 0.3));
+  background: linear-gradient(to bottom, rgba(249, 250, 251, 0.5), rgba(255, 255, 255, 0.2));
   margin-left: -18px;
   margin-right: -18px;
   padding-left: 18px;
   padding-right: 18px;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 /* 2. 统一 h2 (Section 标题) 样式 - 增强视觉层级 */
@@ -861,7 +1006,7 @@ h2 {
   letter-spacing: -0.02em;
   margin-top: 0; 
   margin-bottom: var(--gap-element);
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 2px solid var(--rule);
   display: inline-block;
   position: relative;
@@ -898,7 +1043,7 @@ h3 {
 } */
 
 #overview{
-  padding-top: 48px;   /* 从 hero 到第一个 section 的间距 */
+  padding-top: 28px;   /* 从 hero 到第一个 section 的间距 */
 }
 
 /* 确保第一个 section 不被偶数背景色影响 */
@@ -1041,8 +1186,9 @@ h1, h2, h3, p, li, .caption, .small {
   /* 标题层级间距统一一点 */
   h2 { 
     font-size: 24px; 
-    margin-top: 20px;
-    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
   }
   h2::after {
     width: 40px;
@@ -1050,13 +1196,18 @@ h1, h2, h3, p, li, .caption, .small {
   
   h3 { 
     font-size: 17px; 
-    margin-top: 12px;
+    margin-top: 16px;
+    margin-bottom: 10px;
     padding-left: 10px;
     border-left-width: 3px;
   }
   
   section {
-    padding: 24px 0;
+    padding: 16px 0;
+  }
+  
+  section + section {
+    margin-top: 12px;
   }
   
   section:nth-of-type(even) {
@@ -1067,7 +1218,7 @@ h1, h2, h3, p, li, .caption, .small {
   }
   
   hr {
-    margin: 32px 0;
+    margin: 16px 0;
   }
   
   hr::after {
@@ -1090,21 +1241,27 @@ h1, h2, h3, p, li, .caption, .small {
   }
   .legend { gap: 8px; }
 
-  /* Contributions 列表在手机保持可读 */
-  .contrib-list {
-    padding-left: 18px;           /* 手机上建议恢复一点缩进，可读性更好 */
-    list-style-position: outside; /* bullet 与正文分离，不挤 */
-    margin-top: 8px;
+  /* Contributions cards on mobile */
+  .contrib-card {
+    padding: 14px 16px;
+    gap: 12px;
   }
-  .contrib-list li {
-    line-height: 1.5;
-    margin-bottom: 8px;
+  .contrib-number {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  .contrib-content {
+    font-size: 14px;
   }
 
   /* 轮播卡片在手机放宽，按钮缩小 */
   .carousel-container {
-    margin: 18px auto;
-    padding: 8px 0;
+    margin: 8px auto;
+    padding: 8px 0 36px 0; /* 底部留空给indicators */
+  }
+  .carousel-indicators {
+    bottom: 6px;
   }
   .carousel-track { gap: 12px; }
   .carousel-card {
@@ -1148,6 +1305,16 @@ h1, h2, h3, p, li, .caption, .small {
   .btn { font-size: 12px; padding: 6px 8px; }
   .caption { font-size: 12px; }
   canvas.chart { height: 250px !important; }
+  
+  section {
+    padding: 14px 0;
+  }
+  section + section {
+    margin-top: 10px;
+  }
+  hr {
+    margin: 16px 0;
+  }
 }
 
 
@@ -1297,3 +1464,29 @@ h1, h2, h3, p, li, .caption, .small {
 
 
 main .caption { opacity: 1 !important; }
+
+/* Fade-in Animation */
+.fade-in{
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible{
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-in:nth-child(1) { transition-delay: 0.1s; }
+.fade-in:nth-child(2) { transition-delay: 0.2s; }
+.fade-in:nth-child(3) { transition-delay: 0.3s; }
+.fade-in:nth-child(4) { transition-delay: 0.4s; }
+
+/* Section fade-in */
+section.fade-in-section{
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+section.fade-in-section.visible{
+  opacity: 1;
+  transform: translateY(0);
+}
