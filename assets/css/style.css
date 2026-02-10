@@ -917,39 +917,39 @@ h1, h2, h3, p, li, .caption, .small {
   .next-btn{ right: 8px; }
 }
 
-
 .carousel-container {
   position: relative;
   max-width: 1000px;
   margin: 20px auto;
-  overflow: hidden; /* 防止溢出 */
+  overflow: hidden;
+  user-select: none; /* 禁止选中文本 */
+  -webkit-user-select: none;
 }
 
 .carousel-window {
   width: 100%;
   position: relative;
-  /* 边缘遮罩，让切断处更自然 */
+  /* 蒙版让边缘融合 */
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
 }
 
 .carousel-track {
   display: flex;
-  gap: 15px; /* 稍微减小间距 */
+  gap: 15px;
   width: 100%;
   padding: 10px 0;
+  cursor: grab;
+  /* 启用硬件加速 */
+  transform: translate3d(0, 0, 0); 
 }
 
 .carousel-card {
-  /* 默认 PC 端逻辑 */
   flex: 0 0 60%;
   max-width: 60%;
-  
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* 稍快一点 */
   opacity: 0.3;
   transform: scale(0.9);
-  filter: blur(0px); /* 手机上尽量少用 blur，这会消耗大量 GPU */
-  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -960,20 +960,17 @@ h1, h2, h3, p, li, .caption, .small {
 /* --- 手机端适配 --- */
 @media (max-width: 768px) {
   .carousel-card {
-    /* 手机上卡片宽一点，看视频更清楚 */
-    flex: 0 0 80%;
-    max-width: 80%;
+    flex: 0 0 75%; /* 稍微改小一点点，留出缝隙给按钮 */
+    max-width: 75%;
   }
 }
 
-/* 激活状态 */
 .carousel-card.is-active {
   opacity: 1;
   transform: scale(1);
   z-index: 10;
 }
 
-/* 禁止动画的类（用于瞬移） */
 .no-transition, .no-transition * {
   transition: none !important;
 }
@@ -985,9 +982,11 @@ h1, h2, h3, p, li, .caption, .small {
   overflow: hidden;
   background: #000;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  /* 硬件加速，防止手机闪烁 */
-  transform: translateZ(0); 
-  will-change: transform; 
+  transform: translateZ(0);
+  
+  /* === 核心修复 === */
+  /* 彻底禁止视频层接收点击，确保点击直接穿透到下层或不挡住上层 */
+  pointer-events: none; 
 }
 
 .video-wrapper video {
@@ -995,8 +994,6 @@ h1, h2, h3, p, li, .caption, .small {
   height: 100%;
   object-fit: cover;
   display: block;
-  /* 确保视频在手机上不全屏播放 */
-  pointer-events: none; 
 }
 
 .caption {
@@ -1008,29 +1005,33 @@ h1, h2, h3, p, li, .caption, .small {
   opacity: 0;
   transition: opacity 0.3s;
 }
+.carousel-card.is-active .caption { opacity: 1; }
 
-.carousel-card.is-active .caption {
-  opacity: 1;
-}
-
+/* === 箭头修复 === */
 .nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px; /* 手机上按钮稍微小一点 */
-  height: 40px;
+  width: 50px; /* 加大尺寸 */
+  height: 50px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   cursor: pointer;
-  z-index: 20;
+  
+  /* === 核弹级层级 === */
+  z-index: 9999; /* 保证没有任何东西能盖住它 */
+  
   display: flex;
   align-items: center;
   justify-content: center;
   color: #333;
   border: none;
-  /* 移除手机点击的高亮色块 */
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent; /* 去掉手机点击蓝框 */
+  
+  /* 确保按钮自己可以被点 */
+  pointer-events: auto; 
 }
+
 .prev-btn { left: 10px; }
 .next-btn { right: 10px; }
