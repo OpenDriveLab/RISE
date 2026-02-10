@@ -742,143 +742,147 @@ function initDemoRotator(){
 }
 
 window.addEventListener('load', ()=>{ try{ initDemoRotator(); }catch(e){} });
-// 1. 初始化变量
-// 1. 获取元素
-const track = document.getElementById('track');
-const originalCards = document.querySelectorAll('.carousel-card');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const gapPx = 15; // 必须和 CSS 里的 gap 保持一致
+/* =========================================
+   无缝轮播 (修复回滚时的卡片缩放闪烁问题)
+   ========================================= */
+function initCarousel() {
+  const track = document.getElementById('track');
+  if (!track) return;
 
-// 2. 动态获取当前是从 60% 还是 75% 渲染
-function getCardWidthPercent() {
-  return window.innerWidth < 768 ? 75 : 60;
-}
+  const originalCards = document.querySelectorAll('.carousel-card');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const gapPx = 15;
 
-// 3. 克隆首尾 (Clone)
-const firstClone = originalCards[0].cloneNode(true);
-const lastClone = originalCards[originalCards.length - 1].cloneNode(true);
-track.appendChild(firstClone);
-track.insertBefore(lastClone, originalCards[0]);
+  // 1. 克隆首尾
+  const firstClone = originalCards[0].cloneNode(true);
+  const lastClone = originalCards[originalCards.length - 1].cloneNode(true);
+  track.appendChild(firstClone);
+  track.insertBefore(lastClone, originalCards[0]);
 
-let allCards = document.querySelectorAll('.carousel-card');
-let currentIndex = 1; 
-let isTransitioning = false;
+  let allCards = document.querySelectorAll('.carousel-card');
+  let currentIndex = 1; 
+  let isTransitioning = false;
 
-// 4. 核心：更新位置 (使用纯 CSS calc，稳如老狗)
-function updateTrack(animate) {
-  if (animate) {
-    track.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-  } else {
-    track.style.transition = 'none';
+  // 2. 动态获取宽度
+  function getCardWidthPercent() {
+    return window.innerWidth < 768 ? 75 : 60;
   }
 
-  const wPercent = getCardWidthPercent();
-  
-  // 公式解释：
-  // 居中偏移量 = (100% - 卡片宽度%) / 2
-  // 移动距离 = 居中偏移量 - (当前索引 * (卡片宽度% + 间距px))
-  const centerOffset = (100 - wPercent) / 2;
-  const val = `calc(${centerOffset}% - ${currentIndex} * (${wPercent}% + ${gapPx}px))`;
-  
-  track.style.transform = `translateX(${val})`;
-}
+  // 3. 更新轨道位置
+  function updateTrack(animate) {
+    if (animate) {
+      track.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+    } else {
+      track.style.transition = 'none';
+    }
+    const wPercent = getCardWidthPercent();
+    const centerOffset = (100 - wPercent) / 2;
+    const val = `calc(${centerOffset}% - ${currentIndex} * (${wPercent}% + ${gapPx}px))`;
+    track.style.transform = `translateX(${val})`;
+  }
 
-// 5. 切换逻辑
-function switchSlide(direction) {
-  if (isTransitioning) return;
-  
-  // 防止快速点击越界
-  if (direction === 1 && currentIndex >= allCards.length - 1) return;
-  if (direction === -1 && currentIndex <= 0) return;
-
-  currentIndex += direction;
-  isTransitioning = true;
-  updateTrack(true);
-  updateActive();
-}
-
-// 6. 事件绑定 (暴力绑定 click 和 touchend)
-
-// 电脑端点击
-nextBtn.addEventListener('click', (e) => { e.preventDefault(); switchSlide(1); });
-prevBtn.addEventListener('click', (e) => { e.preventDefault(); switchSlide(-1); });
-
-// 手机端触摸 (加锁防止双重触发)
-let touchLock = false;
-function handleTouch(e, dir) {
-  if(touchLock) return;
-  e.preventDefault(); e.stopPropagation(); // 阻止冒泡
-  switchSlide(dir);
-  touchLock = true;
-  setTimeout(() => touchLock = false, 300);
-}
-nextBtn.addEventListener('touchend', (e) => handleTouch(e, 1));
-prevBtn.addEventListener('touchend', (e) => handleTouch(e, -1));
-
-// 7. 手机滑动支持 (Swipe)
-let touchStartX = 0;
-track.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-track.addEventListener('touchend', e => {
-  const touchEndX = e.changedTouches[0].screenX;
-  if (touchEndX < touchStartX - 50) switchSlide(1); // 左滑 -> 下一张
-  if (touchEndX > touchStartX + 50) switchSlide(-1); // 右滑 -> 上一张
-}, {passive: true});
-
-// 8. 无缝循环 & 视频同步
-track.addEventListener('transitionend', () => {
-  isTransitioning = false;
-  let targetIndex = -1;
-  
-  // 到了克隆的最后一张 -> 跳回真实第1张
-  if (currentIndex === allCards.length - 1) targetIndex = 1;
-  // 到了克隆的第一张 -> 跳回真实最后一张
-  else if (currentIndex === 0) targetIndex = allCards.length - 2;
-
-  if (targetIndex !== -1) {
-    // 视频同步
-    const v1 = allCards[currentIndex].querySelector('video');
-    const v2 = allCards[targetIndex].querySelector('video');
-    if (v1 && v2) v2.currentTime = v1.currentTime;
-
-    // 瞬移
-    track.classList.add('no-transition');
-    allCards.forEach(c => c.classList.add('no-transition'));
-    
-    currentIndex = targetIndex;
-    updateTrack(false); // 重新定位
-    updateActive();
-
-    void track.offsetHeight; // 强制重绘
-    requestAnimationFrame(() => {
-      track.classList.remove('no-transition');
-      allCards.forEach(c => c.classList.remove('no-transition'));
+  // 4. 更新激活状态 (控制缩放和透明度)
+  function updateActive() {
+    allCards.forEach((card, index) => {
+      const video = card.querySelector('video');
+      
+      if (index === currentIndex) {
+        // 当前激活卡片
+        card.classList.add('is-active');
+        // 直接操作样式，保证优先级
+        card.style.opacity = '1';
+        card.style.transform = 'scale(1)'; 
+        card.style.filter = 'blur(0)';
+        card.style.zIndex = '10';
+        if (video) video.play().catch(()=>{});
+      } else {
+        // 非激活卡片
+        card.classList.remove('is-active');
+        card.style.opacity = '0.4';
+        card.style.transform = 'scale(0.9)';
+        card.style.filter = 'blur(1px)';
+        card.style.zIndex = '1';
+        if (video) video.pause();
+      }
     });
   }
-});
 
-// 9. 激活状态 (只播中间，两边暂停)
-function updateActive() {
-  allCards.forEach((card, index) => {
-    const v = card.querySelector('video');
-    if (index === currentIndex) {
-      card.classList.add('is-active');
-      if (v) {
-        v.muted = true;
-        v.playsInline = true;
-        // 必须加 catch 防止报错
-        v.play().catch(()=>{});
+  // 5. 切换逻辑
+  function switchSlide(direction) {
+    if (isTransitioning) return;
+    currentIndex += direction;
+    isTransitioning = true;
+    
+    updateActive(); // 先触发缩放动画
+    updateTrack(true); // 再触发位移动画
+  }
+
+  // 6. 监听动画结束 (处理瞬间回滚 + 防止缩放闪烁)
+  track.addEventListener('transitionend', () => {
+    if (!isTransitioning) return;
+    isTransitioning = false;
+
+    let targetIndex = -1;
+    // 检测是否到了边界
+    if (currentIndex === allCards.length - 1) targetIndex = 1;
+    else if (currentIndex === 0) targetIndex = allCards.length - 2;
+
+    if (targetIndex !== -1) {
+      // === 核心修复开始 ===
+      
+      // 1. 给所有卡片加上禁止动画类
+      // 这步至关重要：防止从 scale(0.9) 变成 scale(1) 时播放动画
+      allCards.forEach(c => c.classList.add('no-transition'));
+      track.style.transition = 'none';
+
+      // 2. 视频同步 (防止黑屏)
+      const currentVideo = allCards[currentIndex].querySelector('video');
+      const targetVideo = allCards[targetIndex].querySelector('video');
+      if (currentVideo && targetVideo) {
+        targetVideo.currentTime = currentVideo.currentTime;
+        targetVideo.play().catch(()=>{});
       }
-    } else {
-      card.classList.remove('is-active');
-      if (v) v.pause();
+
+      // 3. 瞬间瞬移位置
+      currentIndex = targetIndex;
+      updateTrack(false);
+      
+      // 4. 瞬间强制应用激活样式 (因为加了 no-transition，这里会瞬间变大，不会有动画)
+      updateActive();
+
+      // 5. 强制浏览器重绘 (Force Reflow)
+      // 告诉浏览器：“立刻把上面的变化渲染出来，不要等”
+      void track.offsetHeight; 
+
+      // 6. 恢复动画能力 (下一帧再移除锁，确保万无一失)
+      requestAnimationFrame(() => {
+        allCards.forEach(c => c.classList.remove('no-transition'));
+        track.style.transition = ''; 
+      });
+      // === 核心修复结束 ===
     }
   });
+
+  // 7. 事件绑定
+  nextBtn.onclick = (e) => { e.preventDefault(); switchSlide(1); };
+  prevBtn.onclick = (e) => { e.preventDefault(); switchSlide(-1); };
+
+  // 手机滑动
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+  track.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].screenX - touchStartX;
+    if (diff < -50) switchSlide(1);
+    if (diff > 50) switchSlide(-1);
+  }, {passive: true});
+
+  // 初始化
+  updateTrack(false);
+  updateActive();
+  window.addEventListener('resize', () => updateTrack(false));
 }
 
-// 初始化
-updateTrack(false);
-updateActive();
-
-// 监听窗口大小变化（自动适应横竖屏）
-window.addEventListener('resize', () => updateTrack(false));
+window.addEventListener('load', () => {
+  try { initCarousel(); } catch(e) { console.error(e); }
+});

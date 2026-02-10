@@ -851,72 +851,6 @@ h1, h2, h3, p, li, .caption, .small {
 }
 
 
-/* ===== Mobile carousel centering fix ===== */
-@media (max-width: 768px) {
-  .carousel-container{
-    max-width: 100%;
-    margin: 16px auto;
-    padding: 8px 0 44px; /* 底部给 caption 留空间 */
-    overflow: visible;
-  }
-
-  .carousel-window{
-    width: 100%;
-    overflow: hidden;
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-  }
-
-  .carousel-track{
-    display: flex;
-    align-items: center;
-    justify-content: center;   /* 关键：轨道内容居中 */
-    gap: 0;                    /* 关键：去掉间隔避免偏移 */
-    padding: 0;
-    transform: none !important; /* 若 JS/旧样式有 transform，先压住 */
-  }
-
-  .carousel-card{
-    flex: 0 0 100%;
-    max-width: 100%;
-    width: 100%;
-    margin: 0 auto;
-    opacity: 0;
-    transform: none !important;
-    filter: none !important;
-    transition: opacity .25s ease;
-  }
-
-  .carousel-card.is-active{
-    opacity: 1;
-    z-index: 2;
-  }
-
-  .video-wrapper{
-    width: 100%;
-    margin: 0 auto;
-    border-radius: 12px;
-  }
-
-  /* 只显示当前卡片标题，且居中 */
-  .carousel-card .caption{
-    text-align: center;
-    margin-top: 10px;
-    font-size: 15px;
-    line-height: 1.35;
-  }
-
-  /* 按钮垂直居中到视频中线，并贴边 */
-  .nav-btn{
-    top: calc(50% - 22px);   /* 对齐视频视觉中心 */
-    width: 42px;
-    height: 42px;
-    z-index: 5;
-  }
-  .prev-btn{ left: 8px; }
-  .next-btn{ right: 8px; }
-}
-
 /* 基础设置 */
 .carousel-container {
   position: relative;
@@ -1041,4 +975,22 @@ h1, h2, h3, p, li, .caption, .small {
 @media (max-width: 768px) {
   .prev-btn { left: 5px; }
   .next-btn { right: 5px; }
+}
+
+/* 添加这段精简的移动端适配 */
+@media (max-width: 768px) {
+  .carousel-container {
+    padding-bottom: 40px; /* 给下方的按钮留点空间 */
+  }
+  
+  /* 让按钮在手机上稍微大一点，好点按 */
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  /* 确保视频圆角和阴影正常 */
+  .video-wrapper {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
 }
