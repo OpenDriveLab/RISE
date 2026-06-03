@@ -20,6 +20,19 @@ from dynamics_model.utils.model_utils import (
 from dynamics_model.utils import import_custom_class, save_video
 
 
+def _expand_env_vars(obj):
+    """Recursively expand ${VAR}/$VAR environment variables in every string leaf of a
+    loaded config. Lets dynamics configs reference paths via ${RISE_REPO_ROOT}/... instead
+    of hardcoding one machine's absolute layout (and makes them cwd-independent)."""
+    if isinstance(obj, dict):
+        return {k: _expand_env_vars(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_expand_env_vars(v) for v in obj]
+    if isinstance(obj, str):
+        return os.path.expandvars(obj)
+    return obj
+
+
 class DynamicsModel:
     """
         DynamicsModel: Given the current frame [t-3,...,t] and its corresponding action, predict frames [t+1,...,t+20].
@@ -60,6 +73,7 @@ class DynamicsModel:
                 args: Configuration parameter namespace
         """
         cd = load(open(config_file, "r"), Loader=Loader)
+        cd = _expand_env_vars(cd)
         args = argparse.Namespace(**cd)
         return args
     

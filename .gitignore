@@ -9,6 +9,7 @@ vis/
 ckpts/
 ckpts
 
+/data/
 dataset_*
 temp*
 

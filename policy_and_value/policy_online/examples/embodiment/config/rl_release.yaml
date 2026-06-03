@@ -194,7 +194,7 @@ actor:
       
       use_torch_compile: True   # * Newly added to test torch.compile with wm
   
-      dynamics_model_config: "dynamics/dynamics_model/configs/ltx_model/infer.yaml"
+      dynamics_model_config: "${oc.env:RISE_REPO_ROOT}/dynamics/dynamics_model/configs/ltx_model/infer_online.yaml"
 
       n_chunk: 1
 

@@ -13,6 +13,15 @@
 # limitations under the License.
 
 import json
+import os
+from pathlib import Path
+
+# Single source of truth for the repository root. All config paths are anchored to
+# ${oc.env:RISE_REPO_ROOT} (Hydra configs) / ${RISE_REPO_ROOT} (dynamics configs).
+# run_embodiment.sh exports this; we also set it here (at import time, before Hydra
+# composes the config and before Ray captures os.environ) so a direct
+# `python train_embodied_agent.py ...` and all Ray workers resolve paths identically.
+os.environ.setdefault("RISE_REPO_ROOT", str(Path(__file__).resolve().parents[4]))
 
 import hydra
 import torch.multiprocessing as mp
