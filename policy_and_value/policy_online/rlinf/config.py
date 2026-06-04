@@ -16,6 +16,7 @@ import dataclasses
 import importlib.util
 import logging
 import os
+import warnings
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Callable, Optional, Union
 
@@ -625,7 +626,132 @@ def validate_megatron_cfg(cfg: DictConfig) -> DictConfig:
     return cfg
 
 
+def preflight_embodied(cfg) -> None:
+    """Fail fast -- before the (~6 min) worker init -- if required artifacts/configs are
+    missing, aggregating every problem into one actionable message instead of crashing
+    deep inside a worker. Only checks what the config actually enables. Internal errors
+    degrade to warnings (never falsely block a valid run). Set RISE_PREFLIGHT=warn to
+    downgrade real failures to warnings.
+    """
+    problems: list[str] = []
+    openpi = cfg.actor.model.openpi
+
+    def _is_local(p):
+        # Remote/URI paths (gs://, s3://, http(s)://, hf://, ...) are fetched at load time by
+        # the loaders (e.g. openpi_value.shared.download.maybe_download); skip local-fs checks.
+        return isinstance(p, str) and "://" not in p
+
+    # 1. policy / actor checkpoint + normalization stats.
+    # The embodied actor (models/__init__.py get_model) and reward model
+    # (modules/reward_model.py build_model_only) both load <ckpt>/model.safetensors
+    # specifically, so that exact file is what we require for local checkpoints.
+    try:
+        model_dir = cfg.rollout.model_dir
+        if not _is_local(model_dir):
+            pass  # remote checkpoint -- fetched at load time
+        elif not os.path.isdir(model_dir):
+            problems.append(
+                f"rollout.model_dir not found: {model_dir!r} "
+                "(point it at your policy checkpoint directory)"
+            )
+        elif not os.path.isfile(os.path.join(model_dir, "model.safetensors")):
+            problems.append(
+                f"policy weights missing: {os.path.join(model_dir, 'model.safetensors')}"
+            )
+        else:
+            try:
+                from openpi_value.training import config as _oc
+
+                asset_id = _oc.get_config(openpi.config_name).data.assets.asset_id
+                if isinstance(asset_id, (list, tuple)) and len(asset_id) == 1:
+                    asset_id = asset_id[0]
+                # get_model() loads from <model_dir>/assets/<asset_id>/ (fallback) or the
+                # double-nested <model_dir>/assets/assets/<asset_id>/ (primary); accept either.
+                candidates = [
+                    os.path.join(model_dir, "assets", str(asset_id), "norm_stats.json"),
+                    os.path.join(model_dir, "assets", "assets", str(asset_id), "norm_stats.json"),
+                ]
+                if not any(os.path.isfile(c) for c in candidates):
+                    problems.append(
+                        f"normalization stats missing for asset '{asset_id}': expected "
+                        f"{candidates[0]} (generate with "
+                        "policy_offline_and_value scripts/compute_norm_stats_fast.py and place "
+                        "under <model_dir>/assets/<asset_id>/)"
+                    )
+            except Exception as e:  # noqa: BLE001 -- preflight must never falsely block
+                warnings.warn(f"[preflight] norm-stats check skipped: {e}")
+    except Exception as e:  # noqa: BLE001
+        warnings.warn(f"[preflight] policy checkpoint check skipped: {e}")
+
+    # 2. reward model checkpoint (only if enabled).
+    try:
+        if openpi.add_reward_model:
+            rck = openpi.reward_model_ckpt
+            if not _is_local(rck):
+                pass  # remote checkpoint -- fetched at load time
+            elif not os.path.isdir(rck):
+                problems.append(
+                    f"reward_model_ckpt not found: {rck!r} (add_reward_model=True)"
+                )
+            elif not os.path.isfile(os.path.join(rck, "model.safetensors")):
+                problems.append(
+                    f"reward model weights missing: {os.path.join(rck, 'model.safetensors')}"
+                )
+    except Exception as e:  # noqa: BLE001
+        warnings.warn(f"[preflight] reward model check skipped: {e}")
+
+    # 3. dynamics model config + the checkpoints/modules it references (only if enabled).
+    try:
+        if openpi.add_dynamics_model:
+            dcfg = openpi.dynamics_model_config
+            if not (isinstance(dcfg, str) and os.path.isfile(dcfg)):
+                problems.append(
+                    f"dynamics_model_config not found: {dcfg!r} (add_dynamics_model=True)"
+                )
+            else:
+                try:
+                    import yaml as _yaml
+
+                    d = _yaml.safe_load(open(dcfg)) or {}
+
+                    def _x(v):
+                        return os.path.expandvars(v) if isinstance(v, str) else v
+
+                    pre = _x(d.get("pretrained_model_name_or_path"))
+                    if _is_local(pre) and not os.path.isdir(pre):
+                        problems.append(
+                            f"dynamics LTX backbone dir missing: {pre} "
+                            "(run dynamics/dynamics_model/download.sh)"
+                        )
+                    mp = _x((d.get("diffusion_model") or {}).get("model_path"))
+                    if _is_local(mp) and not os.path.isfile(mp):
+                        problems.append(
+                            f"dynamics diffusion checkpoint missing: {mp} "
+                            "(run dynamics/dynamics_model/download.sh)"
+                        )
+                    for k in ("vae_class_path", "diffusion_model_class_path", "pipeline_class_path"):
+                        cp = _x(d.get(k))
+                        if _is_local(cp) and cp.endswith(".py") and not os.path.isfile(cp):
+                            problems.append(f"dynamics class module missing ({k}): {cp}")
+                except Exception as e:  # noqa: BLE001
+                    warnings.warn(f"[preflight] dynamics artifact check skipped: {e}")
+    except Exception as e:  # noqa: BLE001
+        warnings.warn(f"[preflight] dynamics model check skipped: {e}")
+
+    if problems:
+        msg = (
+            "Preflight checks failed (fix these before launching, or set "
+            "RISE_PREFLIGHT=warn to bypass):\n"
+            + "\n".join(f"  - {p}" for p in problems)
+        )
+        if os.environ.get("RISE_PREFLIGHT", "").lower() == "warn":
+            warnings.warn(msg)
+        else:
+            raise RuntimeError(msg)
+
+
 def validate_embodied_cfg(cfg):
+    preflight_embodied(cfg)
     assert cfg.actor.model.model_name in SUPPORTED_MODEL_ARCHS, (
         f"Model {cfg.actor.model.model_name} is not supported"
     )
