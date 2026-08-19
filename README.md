@@ -63,4 +63,4 @@ All assets and code in this repository are under the Apache 2.0 license unless s
 }
 ```
 
-[![Star History Chart](https://api.star-history.com/svg?repos=OpenDriveLab/RISE&type=Date)](https://star-history.com/#OpenDriveLab/RISE&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=OpenDriveLab/RISE&type=Date)](https://star-history.dera.page/#OpenDriveLab/RISE&Date)
